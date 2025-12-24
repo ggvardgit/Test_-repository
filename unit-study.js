@@ -323,19 +323,46 @@ async function loadPracticeQuestions(type) {
     
     // Fallback to sample questions if AI generation failed or not available
     if (questionSet.length === 0) {
+        // Generate a random variation for fallback questions
+        const questionVariations = [
+            {
+                question: `Briefly explain ONE cause of ${currentPeriod.name} (${currentPeriod.dates}).`,
+                options: ["Economic factors", "Political factors", "Social factors", "Cultural factors"],
+                correct: 0,
+                feedback: "Economic factors such as trade, resources, and economic systems were primary drivers of this period."
+            },
+            {
+                question: `Briefly explain ONE effect of ${currentPeriod.name} (${currentPeriod.dates}).`,
+                options: ["Social changes", "Economic growth", "Political developments", "Cultural shifts"],
+                correct: 2,
+                feedback: "Political developments, including new forms of government and political structures, were significant effects of this period."
+            },
+            {
+                question: `Briefly explain ONE way ${currentPeriod.name} (${currentPeriod.dates}) changed American society.`,
+                options: ["Demographic changes", "Economic transformation", "Political restructuring", "Cultural evolution"],
+                correct: 1,
+                feedback: "Economic transformation through new trade patterns, industries, or labor systems fundamentally changed American society."
+            },
+            {
+                question: `Briefly explain ONE continuity from ${currentPeriod.name} (${currentPeriod.dates}) to later periods.`,
+                options: ["Economic systems", "Political institutions", "Social hierarchies", "Cultural values"],
+                correct: 3,
+                feedback: "Cultural values and beliefs often persisted across periods, influencing later developments."
+            }
+        ];
+        
+        // Pick a random variation
+        const randomIndex = Math.floor(Math.random() * questionVariations.length);
+        const selectedVariation = questionVariations[randomIndex];
+        
         const questions = {
             saq: [
                 {
-                    id: 1,
-                    question: `Briefly explain ONE cause of ${currentPeriod.name} (${currentPeriod.dates}).`,
-                    options: [
-                        "Economic factors",
-                        "Political factors",
-                        "Social factors",
-                        "Cultural factors"
-                    ],
-                    correct: 0,
-                    feedback: "Economic factors such as trade, resources, and economic systems were primary drivers of this period."
+                    id: `fallback-${Date.now()}-${randomIndex}`,
+                    question: selectedVariation.question,
+                    options: selectedVariation.options,
+                    correct: selectedVariation.correct,
+                    feedback: selectedVariation.feedback
                 }
             ],
             dbq: [
@@ -375,12 +402,9 @@ async function loadPracticeQuestions(type) {
                     `).join('')}
                 </ul>
                 <div class="feedback" style="display: none;"></div>
-                <button class="submit-btn" onclick="checkSAQAnswer('${String(q.id)}', ${q.correct})">Submit Answer</button>
-                ${window.GeminiAPI && window.GeminiAPI.hasApiKey() ? `
-                    <button class="submit-btn" onclick="generateNewQuestion('saq')" style="background-color: var(--secondary-color); margin-top: var(--spacing-md);">
-                        Generate New Question
-                    </button>
-                ` : ''}
+                <div class="question-actions">
+                    <button class="submit-btn" onclick="checkSAQAnswer('${String(q.id)}', ${q.correct})">Submit Answer</button>
+                </div>
             </div>
         `).join('');
         
@@ -460,12 +484,15 @@ async function loadPracticeQuestions(type) {
 // Generate new question using AI
 async function generateNewQuestion(type) {
     const practiceContent = document.getElementById('practice-content');
-    if (!practiceContent || !window.GeminiAPI || !window.GeminiAPI.hasApiKey()) {
-        alert('Please configure your Gemini API key in the settings to generate new questions.');
-        return;
-    }
+    if (!practiceContent) return;
     
-    await loadPracticeQuestions(type);
+    // If API is available, use it; otherwise use fallback
+    if (window.GeminiAPI && window.GeminiAPI.hasApiKey()) {
+        await loadPracticeQuestions(type);
+    } else {
+        // For fallback, just reload with a new question
+        await loadPracticeQuestions(type);
+    }
 }
 
 function checkSAQAnswer(questionId, correctIndex) {
@@ -517,6 +544,22 @@ function checkSAQAnswer(questionId, correctIndex) {
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.textContent = 'Answered';
+    }
+    
+    // Add "Next Question" button after answering
+    const nextBtn = questionEl.querySelector('.next-question-btn');
+    if (!nextBtn) {
+        const nextButton = document.createElement('button');
+        nextButton.className = 'submit-btn next-question-btn';
+        nextButton.style.cssText = 'background-color: var(--success-color); margin-top: var(--spacing-md);';
+        nextButton.textContent = 'Next Question →';
+        nextButton.onclick = () => {
+            const practiceTypeBtns = document.querySelectorAll('.practice-type-btn');
+            const activeType = Array.from(practiceTypeBtns).find(btn => btn.classList.contains('active'));
+            const currentType = activeType ? activeType.dataset.type : 'saq';
+            loadPracticeQuestions(currentType);
+        };
+        submitBtn.parentNode.insertBefore(nextButton, submitBtn.nextSibling);
     }
 }
 

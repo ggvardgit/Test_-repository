@@ -1297,6 +1297,22 @@ a:focus {
     outline-offset: 2px;
 }
 
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.next-question-btn {
+    background-color: var(--success-color) !important;
+}
+
+.next-question-btn:hover,
+.next-question-btn:focus {
+    background-color: #059669 !important;
+    outline: 2px solid var(--success-color);
+    outline-offset: 2px;
+}
+
 /* Modal */
 .modal {
     display: none;
