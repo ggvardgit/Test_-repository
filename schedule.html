@@ -1,104 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Join live APUSH study sessions and review topics">
+    <meta name="description" content="AP U.S. History Live Study Sessions and Review">
     <title>Live Study Schedule | APUSH Learning Hub</title>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <div class="nav-container">
-            <a href="index.html" class="logo" aria-label="APUSH Learning Hub Home">
-                <span class="logo-text">APUSH Hub</span>
-            </a>
-            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li><a href="units.html" class="nav-link">Units</a></li>
-                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
-                <li><a href="schedule.html" class="nav-link active" aria-current="page">Live Study</a></li>
-                <li><a href="resources.html" class="nav-link">Resources</a></li>
-                <li><a href="api-config.html" class="nav-link">AI Settings</a></li>
-            </ul>
-            <div class="nav-controls">
-                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
-                    <span class="theme-icon">🌙</span>
-                </button>
-                <button class="motion-toggle" aria-label="Toggle reduced motion" title="Reduce motion">
-                    <span class="motion-icon">⚙️</span>
-                </button>
-            </div>
-        </div>
-    </nav>
 
-    <main class="main-content">
-        <section class="schedule-header" aria-labelledby="schedule-heading">
-            <div class="container">
-                <h1 id="schedule-heading" class="page-title">Live Study Schedule</h1>
-                <p class="page-subtitle">Join scheduled study sessions and review APUSH topics with peers</p>
-            </div>
-        </section>
+/* =========================
+   APUSH LEARNING HUB THEME
+   FBLA NATIONALS DESIGN
+========================= */
 
-        <section class="schedule-content">
-            <div class="container">
-                <div class="schedule-controls">
-                    <div class="view-toggle">
-                        <button class="view-btn active" data-view="week" aria-pressed="true">Week View</button>
-                        <button class="view-btn" data-view="month" aria-pressed="false">Month View</button>
-                    </div>
-                    <div class="filter-controls">
-                        <select id="period-filter" class="filter-select" aria-label="Filter by period">
-                            <option value="all">All Periods</option>
-                            <option value="2">Period 2</option>
-                            <option value="3">Period 3</option>
-                            <option value="4">Period 4</option>
-                            <option value="5">Period 5</option>
-                            <option value="6">Period 6</option>
-                            <option value="7">Period 7</option>
-                            <option value="8">Period 8</option>
-                            <option value="9">Period 9</option>
-                        </select>
-                    </div>
-                </div>
+:root {
+    --primary: #1e3a5f;        /* Colonial Navy */
+    --secondary: #8b1e3f;      /* Historical Red */
+    --accent: #d4af37;         /* Gold */
+    --background: #f5f1ea;     /* Parchment */
+    --card-bg: #ffffff;
+    --text-dark: #1f2933;
+    --text-light: #6b7280;
+}
 
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <button class="calendar-nav-btn" id="prev-week" aria-label="Previous week">
-                            <span>←</span>
-                        </button>
-                        <h2 class="calendar-title" id="calendar-title">This Week</h2>
-                        <button class="calendar-nav-btn" id="next-week" aria-label="Next week">
-                            <span>→</span>
-                        </button>
-                    </div>
-                    <div class="calendar-grid" id="calendar-grid" role="grid">
-                        <!-- Calendar will be dynamically generated -->
-                    </div>
-                </div>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-                <div class="upcoming-sessions">
-                    <h2 class="section-title">Upcoming Sessions</h2>
-                    <div class="sessions-list" id="sessions-list" role="list">
-                        <!-- Sessions will be dynamically generated -->
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+body {
+    font-family: "Inter", sans-serif;
+    background-color: var(--background);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
 
-    <footer class="footer" role="contentinfo">
-        <div class="container">
-            <p>&copy; 2024 APUSH Learning Hub. Designed for AP U.S. History exam preparation.</p>
-        </div>
-    </footer>
+/* =========================
+   NAVIGATION
+========================= */
+.navbar {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
 
-    <script src="script.js"></script>
-    <script src="schedule.js"></script>
-</body>
-</html>
+.nav-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-text {
+    font-family: "Merriweather", serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+}
+
+.nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    width: 100%;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+.schedule-header {
+    background: linear-gradient(
+        rgba(30,58,95,0.85),
+        rgba(30,58,95,0.85)
+    ),
+    url("https://images.unsplash.com/photo-1541872703-1dfe1c48f1b9");
+    background-size: cover;
+    background-position: center;
+    color: white;
+    padding: 4rem 1rem;
+    text-align: center;
+}
+
+.page-title {
+    font-family: "Merriweather", serif;
+    font-size: 2.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.schedule-content {
+    padding: 3rem 0;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+.schedule-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.view-btn {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.view-btn.active,
+.view-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.filter-select {
+    padding: 0.6rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+/* =========================
+   CALENDAR
+========================= */
+.calendar-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.calendar-title {
+    font-family: "Merriweather", serif;
+    font-size: 1.4rem;
+}
+
+.calendar-nav-btn {
+    background: var(--secondary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Placeholder grid styling */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 1rem;
+}
+
+/* =========================
+   UPCOMING SESSIONS
+========================= */
+.upcoming-sessions {
+    margin-top: 3rem;
+}
+
+.section-title {
+    font-family: "Merriweather", serif;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+.sessions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.footer {
+    background: var(--primary);
+    color: white;
+    text-align: center;
+    padding: 1.5rem;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+}
