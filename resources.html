@@ -143,6 +143,62 @@
                 </div>
             </div>
         </div>
+
+        <!-- SAQ Practice Modal -->
+        <div class="modal" id="saq-modal" role="dialog" aria-labelledby="saq-modal-title" aria-hidden="true">
+            <div class="modal-content saq-modal-content">
+                <div class="modal-header">
+                    <h2 id="saq-modal-title" class="modal-title">SAQ Practice</h2>
+                    <button class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="saq-practice">
+                        <div class="saq-progress">
+                            <span id="saq-question-counter">Question 1 of 10</span>
+                            <button id="saq-prev-btn" class="saq-nav-btn" disabled>← Previous</button>
+                            <button id="saq-next-btn" class="saq-nav-btn">Next →</button>
+                        </div>
+                        <div class="saq-question-container">
+                            <div class="saq-question" id="saq-question-text"></div>
+                            <div class="saq-prompt" id="saq-prompt-text"></div>
+                            <div class="saq-answer-section">
+                                <label for="saq-answer-input" class="saq-answer-label">Your Answer:</label>
+                                <textarea id="saq-answer-input" class="saq-answer-input" rows="6" placeholder="Type your response here..."></textarea>
+                                <div class="saq-answer-hint" id="saq-answer-hint">Tip: SAQ responses should be 2-3 sentences and directly address all parts of the question.</div>
+                            </div>
+                            <div class="saq-actions">
+                                <button id="saq-check-btn" class="saq-check-btn">Check Answer</button>
+                                <button id="saq-show-answer-btn" class="saq-show-answer-btn">Show Sample Answer</button>
+                            </div>
+                            <div class="saq-feedback" id="saq-feedback" style="display: none;"></div>
+                            <div class="saq-sample-answer" id="saq-sample-answer" style="display: none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Timeline Modal -->
+        <div class="modal" id="timeline-modal" role="dialog" aria-labelledby="timeline-modal-title" aria-hidden="true">
+            <div class="modal-content timeline-modal-content">
+                <div class="modal-header">
+                    <h2 id="timeline-modal-title" class="modal-title">Interactive Timeline</h2>
+                    <button class="modal-close" aria-label="Close modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="timeline-container">
+                        <div class="timeline-header">
+                            <h3 id="timeline-period-name"></h3>
+                            <p id="timeline-period-dates"></p>
+                        </div>
+                        <div class="timeline-scroll-container" id="timeline-scroll-container">
+                            <div class="timeline-line"></div>
+                            <div class="timeline-events" id="timeline-events"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <footer class="footer" role="contentinfo">
@@ -151,6 +207,7 @@
         </div>
     </footer>
 
+    <script src="apush-data.js"></script>
     <script src="script.js"></script>
     <script src="resources.js"></script>
 </body>

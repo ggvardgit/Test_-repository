@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderResources();
     setupFilters();
     setupDBQTool();
+    setupSAQPractice();
+    setupTimeline();
 });
 
 // Sample resources data
@@ -165,9 +167,12 @@ function createResourceCard(resource) {
 function handleResourceClick(resource) {
     if (resource.type === 'tool' && resource.skill === 'dbq') {
         APUSH.openModal('dbq-modal');
+    } else if (resource.format === 'practice' && resource.skill === 'saq') {
+        openSAQPractice(resource);
+    } else if (resource.format === 'timeline') {
+        openTimeline(resource);
     } else if (resource.format === 'practice') {
-        // Navigate to practice or show practice questions
-        alert(`Opening ${resource.title}. In a full implementation, this would load practice questions.`);
+        alert(`Opening ${resource.title}. Practice questions for ${resource.skill.toUpperCase()} coming soon.`);
     } else {
         alert(`Opening ${resource.title}. In a full implementation, this would load the resource.`);
     }
@@ -234,4 +239,261 @@ function setupDBQTool() {
             alert(`Annotation tool for ${type} would open here.`);
         });
     });
+}
+
+// SAQ Practice Questions Data
+const SAQ_QUESTIONS = {
+    all: [
+        {
+            question: "Briefly explain ONE way in which the development of the Atlantic economy in the seventeenth and eighteenth centuries contributed to the development of regional identities in the British North American colonies.",
+            prompt: "a) Explain ONE way in which the development of the Atlantic economy contributed to regional identities.",
+            sampleAnswer: "The Atlantic economy fostered regional specialization: New England focused on shipbuilding and trade, the Middle Colonies on grain production, and the Southern Colonies on cash crops like tobacco and rice. This economic specialization created distinct regional cultures and social structures."
+        },
+        {
+            question: "Briefly explain ONE specific historical development that represents an accomplishment of the national government under the Articles of Confederation.",
+            prompt: "b) Explain ONE accomplishment of the Articles of Confederation government.",
+            sampleAnswer: "The Articles of Confederation successfully established the Northwest Ordinance of 1787, which created a process for admitting new states, prohibited slavery in the Northwest Territory, and set aside land for public education."
+        },
+        {
+            question: "Briefly explain ONE way in which the market revolution changed women's roles in society from 1800 to 1848.",
+            prompt: "c) Explain ONE way the market revolution changed women's roles.",
+            sampleAnswer: "The market revolution created the \"cult of domesticity,\" which idealized women as moral guardians of the home while men worked in the market economy. This separated public and private spheres, limiting women's economic participation outside the home."
+        },
+        {
+            question: "Briefly explain ONE specific historical effect of the Civil War on the economy of the United States.",
+            prompt: "d) Explain ONE economic effect of the Civil War.",
+            sampleAnswer: "The Civil War accelerated industrialization in the North, as the Union needed mass-produced weapons, uniforms, and supplies. This led to increased factory production and consolidated economic power in the Northeast."
+        },
+        {
+            question: "Briefly explain ONE way in which the Progressive Era reforms represented a response to the problems created by industrialization and urbanization.",
+            prompt: "e) Explain ONE Progressive Era response to industrialization problems.",
+            sampleAnswer: "Progressive reformers pushed for workplace safety regulations and labor laws, such as limiting working hours and improving factory conditions, in response to dangerous and exploitative industrial working conditions."
+        }
+    ],
+    3: [
+        {
+            question: "Briefly explain ONE specific cause of the American Revolution.",
+            prompt: "a) Explain ONE cause of the American Revolution.",
+            sampleAnswer: "The British imposition of taxes without colonial representation, such as the Stamp Act and Townshend Acts, violated the colonists' understanding of their rights as Englishmen and led to widespread resistance."
+        },
+        {
+            question: "Briefly explain ONE way in which the American Revolution changed political ideas about government.",
+            prompt: "b) Explain ONE political idea changed by the Revolution.",
+            sampleAnswer: "The Revolution popularized the concept of republicanism, emphasizing that government authority derives from the consent of the governed rather than divine right or hereditary monarchy."
+        },
+        {
+            question: "Briefly explain ONE reason why the Articles of Confederation were replaced by the Constitution.",
+            prompt: "c) Explain ONE reason for replacing the Articles of Confederation.",
+            sampleAnswer: "The Articles gave the national government insufficient power to regulate commerce and tax, leading to economic chaos and inability to address issues like Shays' Rebellion, which convinced leaders a stronger central government was needed."
+        }
+    ]
+};
+
+let currentSAQIndex = 0;
+let currentSAQSet = [];
+
+function setupSAQPractice() {
+    const prevBtn = document.getElementById('saq-prev-btn');
+    const nextBtn = document.getElementById('saq-next-btn');
+    const checkBtn = document.getElementById('saq-check-btn');
+    const showAnswerBtn = document.getElementById('saq-show-answer-btn');
+
+    if (prevBtn) {
+        prevBtn.addEventListener('click', () => {
+            if (currentSAQIndex > 0) {
+                currentSAQIndex--;
+                displaySAQQuestion();
+            }
+        });
+    }
+
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            if (currentSAQIndex < currentSAQSet.length - 1) {
+                currentSAQIndex++;
+                displaySAQQuestion();
+            }
+        });
+    }
+
+    if (checkBtn) {
+        checkBtn.addEventListener('click', () => {
+            checkSAQAnswer();
+        });
+    }
+
+    if (showAnswerBtn) {
+        showAnswerBtn.addEventListener('click', () => {
+            showSAQAnswer();
+        });
+    }
+}
+
+function openSAQPractice(resource) {
+    // Determine which question set to use
+    const period = resource.period;
+    
+    if (period === 'all') {
+        currentSAQSet = SAQ_QUESTIONS.all;
+    } else if (SAQ_QUESTIONS[period]) {
+        currentSAQSet = SAQ_QUESTIONS[period];
+    } else {
+        // Fallback to all questions if period-specific set not available
+        currentSAQSet = SAQ_QUESTIONS.all;
+    }
+
+    if (!currentSAQSet || currentSAQSet.length === 0) {
+        alert('No SAQ questions available for this period.');
+        return;
+    }
+
+    currentSAQIndex = 0;
+    displaySAQQuestion();
+    APUSH.openModal('saq-modal');
+}
+
+function displaySAQQuestion() {
+    const question = currentSAQSet[currentSAQIndex];
+    if (!question) return;
+
+    const questionText = document.getElementById('saq-question-text');
+    const promptText = document.getElementById('saq-prompt-text');
+    const answerInput = document.getElementById('saq-answer-input');
+    const counter = document.getElementById('saq-question-counter');
+    const prevBtn = document.getElementById('saq-prev-btn');
+    const nextBtn = document.getElementById('saq-next-btn');
+    const feedback = document.getElementById('saq-feedback');
+    const sampleAnswer = document.getElementById('saq-sample-answer');
+
+    if (questionText) questionText.textContent = question.question;
+    if (promptText) promptText.textContent = question.prompt;
+    if (answerInput) answerInput.value = '';
+    if (counter) counter.textContent = `Question ${currentSAQIndex + 1} of ${currentSAQSet.length}`;
+    
+    if (prevBtn) prevBtn.disabled = currentSAQIndex === 0;
+    if (nextBtn) nextBtn.disabled = currentSAQIndex === currentSAQSet.length - 1;
+    
+    if (feedback) {
+        feedback.style.display = 'none';
+        feedback.innerHTML = '';
+    }
+    if (sampleAnswer) {
+        sampleAnswer.style.display = 'none';
+        sampleAnswer.innerHTML = '';
+    }
+}
+
+function checkSAQAnswer() {
+    const answerInput = document.getElementById('saq-answer-input');
+    const feedback = document.getElementById('saq-feedback');
+    
+    if (!answerInput || !feedback) return;
+    
+    const userAnswer = answerInput.value.trim();
+    
+    if (userAnswer.length === 0) {
+        feedback.style.display = 'block';
+        feedback.className = 'saq-feedback feedback-error';
+        feedback.innerHTML = '<strong>Please provide an answer before checking.</strong>';
+        return;
+    }
+    
+    // Basic feedback based on length and structure
+    let feedbackText = '<strong>Good start!</strong><br>';
+    
+    if (userAnswer.length < 50) {
+        feedbackText += 'Your answer is quite brief. Try to provide 2-3 sentences with specific historical details.';
+    } else if (userAnswer.length < 150) {
+        feedbackText += 'Your answer has good length. Make sure you directly address all parts of the question with specific examples.';
+    } else {
+        feedbackText += 'Your answer is well-developed. Remember: SAQ responses should be concise but complete.';
+    }
+    
+    feedback.style.display = 'block';
+    feedback.className = 'saq-feedback feedback-info';
+    feedback.innerHTML = feedbackText;
+}
+
+function showSAQAnswer() {
+    const question = currentSAQSet[currentSAQIndex];
+    const sampleAnswer = document.getElementById('saq-sample-answer');
+    
+    if (!question || !sampleAnswer) return;
+    
+    sampleAnswer.style.display = 'block';
+    sampleAnswer.innerHTML = `
+        <h4>Sample Answer:</h4>
+        <p>${question.sampleAnswer}</p>
+    `;
+}
+
+function setupTimeline() {
+    // Timeline setup is handled in openTimeline function
+}
+
+function openTimeline(resource) {
+    // Get period data from APUSH_DATA
+    const period = parseInt(resource.period);
+    
+    // Try multiple ways to access APUSH_DATA
+    let periodData = null;
+    
+    if (typeof window !== 'undefined' && window.APUSH_DATA && window.APUSH_DATA.periods && window.APUSH_DATA.periods[period]) {
+        periodData = window.APUSH_DATA.periods[period];
+    } else if (typeof APUSH_DATA !== 'undefined' && APUSH_DATA.periods && APUSH_DATA.periods[period]) {
+        periodData = APUSH_DATA.periods[period];
+    }
+    
+    if (!periodData) {
+        alert('Timeline data not available for this period.');
+        return;
+    }
+    
+    displayTimeline(periodData, resource.title);
+    APUSH.openModal('timeline-modal');
+}
+
+function displayTimeline(periodData, title) {
+    const periodName = document.getElementById('timeline-period-name');
+    const periodDates = document.getElementById('timeline-period-dates');
+    const eventsContainer = document.getElementById('timeline-events');
+    const modalTitle = document.getElementById('timeline-modal-title');
+    
+    if (!periodData || !periodData.timeline) {
+        alert('No timeline data available for this period.');
+        return;
+    }
+    
+    if (modalTitle) modalTitle.textContent = title || `Period ${periodData.number}: ${periodData.name}`;
+    if (periodName) periodName.textContent = periodData.name;
+    if (periodDates) periodDates.textContent = periodData.dates;
+    
+    if (eventsContainer) {
+        eventsContainer.innerHTML = '';
+        
+        periodData.timeline.forEach((event, index) => {
+            const eventElement = document.createElement('div');
+            eventElement.className = 'timeline-event';
+            eventElement.setAttribute('data-index', index);
+            
+            eventElement.innerHTML = `
+                <div class="timeline-event-marker"></div>
+                <div class="timeline-event-content">
+                    <div class="timeline-event-date">${event.date}</div>
+                    <div class="timeline-event-title">${event.title}</div>
+                    <div class="timeline-event-description">${event.description}</div>
+                </div>
+            `;
+            
+            // Add click handler for interactivity
+            eventElement.addEventListener('click', () => {
+                // Remove active class from all events
+                document.querySelectorAll('.timeline-event').forEach(e => e.classList.remove('active'));
+                // Add active class to clicked event
+                eventElement.classList.add('active');
+            });
+            
+            eventsContainer.appendChild(eventElement);
+        });
+    }
 }
