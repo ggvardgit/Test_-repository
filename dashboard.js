@@ -100,7 +100,7 @@ function renderRecommendations() {
         `;
     } else {
         container.innerHTML = `
-            <p class="recommendation-text">Great job! You've completed all periods. Review your weakest themes or take practice exams.</p>
+            <p class="recommendation-text">All periods completed. Review weakest themes or complete practice exams.</p>
         `;
     }
 }

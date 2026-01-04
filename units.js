@@ -44,8 +44,8 @@ function createPeriodCard(period, progress) {
         </div>
         
         <div class="unit-card-meta">
-            <span>⏱️ ${period.studyTime} min</span>
-            <span>📊 ${masteryPercentage}% Mastery</span>
+            <span>${period.studyTime} min</span>
+            <span>${masteryPercentage}% Mastery</span>
         </div>
         
         <div class="unit-card-skills">

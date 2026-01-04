@@ -165,17 +165,37 @@ function createResourceCard(resource) {
 }
 
 function handleResourceClick(resource) {
+    if (!resource) {
+        console.error('No resource provided to handleResourceClick');
+        return;
+    }
+    
+    // Check for timeline resources first (by format or type)
+    if (resource.format === 'timeline' || resource.type === 'timeline') {
+        openTimeline(resource);
+        return;
+    }
+    
+    // Check for DBQ tools
     if (resource.type === 'tool' && resource.skill === 'dbq') {
         APUSH.openModal('dbq-modal');
-    } else if (resource.format === 'practice' && resource.skill === 'saq') {
-        openSAQPractice(resource);
-    } else if (resource.format === 'timeline') {
-        openTimeline(resource);
-    } else if (resource.format === 'practice') {
-        alert(`Opening ${resource.title}. Practice questions for ${resource.skill.toUpperCase()} coming soon.`);
-    } else {
-        alert(`Opening ${resource.title}. In a full implementation, this would load the resource.`);
+        return;
     }
+    
+    // Check for SAQ practice
+    if (resource.format === 'practice' && resource.skill === 'saq') {
+        openSAQPractice(resource);
+        return;
+    }
+    
+    // Check for other practice resources
+    if (resource.format === 'practice') {
+        alert(`Opening ${resource.title}. Practice questions for ${resource.skill.toUpperCase()} coming soon.`);
+        return;
+    }
+    
+    // Fallback for any other resources
+    alert(`Opening ${resource.title}. In a full implementation, this would load the resource.`);
 }
 
 function setupFilters() {
@@ -399,14 +419,14 @@ function checkSAQAnswer() {
     }
     
     // Basic feedback based on length and structure
-    let feedbackText = '<strong>Good start!</strong><br>';
+    let feedbackText = '<strong>Review your response:</strong><br>';
     
     if (userAnswer.length < 50) {
-        feedbackText += 'Your answer is quite brief. Try to provide 2-3 sentences with specific historical details.';
+        feedbackText += 'Response is brief. Provide 2-3 sentences with specific historical details.';
     } else if (userAnswer.length < 150) {
-        feedbackText += 'Your answer has good length. Make sure you directly address all parts of the question with specific examples.';
+        feedbackText += 'Response length is adequate. Address all parts of the question with specific examples.';
     } else {
-        feedbackText += 'Your answer is well-developed. Remember: SAQ responses should be concise but complete.';
+        feedbackText += 'Response is developed. SAQ responses should be concise but complete.';
     }
     
     feedback.style.display = 'block';
@@ -432,25 +452,56 @@ function setupTimeline() {
 }
 
 function openTimeline(resource) {
-    // Get period data from APUSH_DATA
-    const period = parseInt(resource.period);
-    
-    // Try multiple ways to access APUSH_DATA
-    let periodData = null;
-    
-    if (typeof window !== 'undefined' && window.APUSH_DATA && window.APUSH_DATA.periods && window.APUSH_DATA.periods[period]) {
-        periodData = window.APUSH_DATA.periods[period];
-    } else if (typeof APUSH_DATA !== 'undefined' && APUSH_DATA.periods && APUSH_DATA.periods[period]) {
-        periodData = APUSH_DATA.periods[period];
-    }
-    
-    if (!periodData) {
-        alert('Timeline data not available for this period.');
+    if (!resource) {
+        console.error('No resource provided to openTimeline');
         return;
     }
     
-    displayTimeline(periodData, resource.title);
-    APUSH.openModal('timeline-modal');
+    // Get period data from APUSH_DATA
+    const period = parseInt(resource.period);
+    
+    if (isNaN(period)) {
+        console.error('Invalid period:', resource.period);
+        alert('Invalid period specified for timeline.');
+        return;
+    }
+    
+    // Try multiple ways to access APUSH_DATA
+    let periodData = null;
+    let apushData = null;
+    
+    // Check window.APUSH_DATA first
+    if (typeof window !== 'undefined' && window.APUSH_DATA) {
+        apushData = window.APUSH_DATA;
+    }
+    // Fallback to global APUSH_DATA
+    else if (typeof APUSH_DATA !== 'undefined') {
+        apushData = APUSH_DATA;
+    }
+    
+    // Get period data
+    if (apushData && apushData.periods && apushData.periods[period]) {
+        periodData = apushData.periods[period];
+    }
+    
+    if (!periodData) {
+        console.error('Timeline data not found for period:', period);
+        alert(`Timeline data not available for Period ${period}. Please make sure apush-data.js is loaded.`);
+        return;
+    }
+    
+    try {
+        displayTimeline(periodData, resource.title);
+        if (typeof APUSH !== 'undefined' && APUSH.openModal) {
+            APUSH.openModal('timeline-modal');
+        } else {
+            console.error('APUSH.openModal is not available');
+            alert('Error: Cannot open timeline modal. Please refresh the page.');
+        }
+    } catch (error) {
+        console.error('Error displaying timeline:', error);
+        alert('An error occurred while displaying the timeline. Please check the console for details.');
+    }
 }
 
 function displayTimeline(periodData, title) {

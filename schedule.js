@@ -207,11 +207,10 @@ function createSessionCard(session) {
         </div>
         <div class="session-meta">
             <div class="session-meta-item">
-                <span>📅</span>
                 <span>Period ${session.period}</span>
             </div>
             <div class="session-meta-item">
-                <span>⏱️</span>
+                <span>Time:</span>
                 <span>${session.duration} min</span>
             </div>
             <div class="session-meta-item">
