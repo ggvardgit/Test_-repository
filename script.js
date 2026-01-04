@@ -47,7 +47,7 @@ function initThemeToggle() {
 
 function updateThemeIcon(theme, iconElement) {
     if (iconElement) {
-        iconElement.textContent = theme === 'dark' ? 'Light' : 'Dark';
+        iconElement.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
 }
 
