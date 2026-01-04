@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Account settings and preferences">
+    <title>Settings | APUSH Learning Hub</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .settings-container {
+            display: flex;
+            min-height: calc(100vh - 200px);
+            gap: var(--spacing-xl);
+            padding: var(--spacing-xl) 0;
+        }
+        
+        .settings-sidebar {
+            width: 240px;
+            flex-shrink: 0;
+        }
+        
+        .settings-nav {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-md);
+            position: sticky;
+            top: calc(var(--spacing-xl) + 80px);
+        }
+        
+        .settings-nav-item {
+            display: block;
+            padding: var(--spacing-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: all var(--transition-base);
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.9375rem;
+        }
+        
+        .settings-nav-item:hover {
+            background-color: var(--bg-tertiary);
+            color: var(--primary-color);
+        }
+        
+        .settings-nav-item.active {
+            background-color: var(--primary-color);
+            color: var(--text-inverse);
+            font-weight: 500;
+        }
+        
+        .settings-content {
+            flex: 1;
+            max-width: 800px;
+        }
+        
+        .settings-section {
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .settings-section.hidden {
+            display: none;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-label {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .setting-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .setting-control {
+            flex-shrink: 0;
+            margin-left: var(--spacing-lg);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background-color: var(--bg-tertiary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color var(--transition-base);
+        }
+        
+        .toggle-switch.active {
+            background-color: var(--primary-color);
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform var(--transition-base);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(24px);
+        }
+        
+        .select-control {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .select-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .btn-secondary {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+        
+        .btn-danger {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--error-color);
+            color: var(--text-inverse);
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--error-light);
+        }
+        
+        .account-email {
+            font-size: 1rem;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .last-login {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: var(--spacing-sm);
+        }
+        
+        .password-form {
+            margin-top: var(--spacing-lg);
+            padding-top: var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .password-form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .password-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .password-form-input {
+            width: 100%;
+            max-width: 400px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+        
+        .password-form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .password-form-actions {
+            margin-top: var(--spacing-md);
+        }
+        
+        .password-message {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            margin-top: var(--spacing-md);
+            display: none;
+        }
+        
+        .password-message.show {
+            display: block;
+        }
+        
+        .password-message.success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success-color);
+            color: var(--success-color);
+        }
+        
+        .password-message.error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--error-color);
+            color: var(--error-color);
+        }
+        
+        @media (max-width: 768px) {
+            .settings-container {
+                flex-direction: column;
+            }
+            
+            .settings-sidebar {
+                width: 100%;
+            }
+            
+            .settings-nav {
+                position: static;
+                display: flex;
+                overflow-x: auto;
+                gap: var(--spacing-sm);
+            }
+            
+            .settings-nav-item {
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-container">
+            <a href="index.html" class="logo" aria-label="APUSH Learning Hub Home">
+                <span class="logo-text">APUSH Hub</span>
+            </a>
+            <button class="nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="units.html" class="nav-link">Units</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="schedule.html" class="nav-link">Live Study</a></li>
+                <li><a href="resources.html" class="nav-link">Resources</a></li>
+                <li><a href="api-config.html" class="nav-link">AI Settings</a></li>
+                <li><a href="settings.html" class="nav-link active">Settings</a></li>
+            </ul>
+            <div class="nav-controls">
+                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <button class="motion-toggle" aria-label="Toggle reduced motion" title="Reduce motion">
+                    <span class="motion-icon">⚙️</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="settings-container">
+                <aside class="settings-sidebar">
+                    <nav class="settings-nav" role="navigation" aria-label="Settings navigation">
+                        <a href="#account" class="settings-nav-item active" data-section="account">Account</a>
+                        <a href="#appearance" class="settings-nav-item" data-section="appearance">Appearance</a>
+                        <a href="#accessibility" class="settings-nav-item" data-section="accessibility">Accessibility</a>
+                        <a href="#privacy" class="settings-nav-item" data-section="privacy">Privacy & Data</a>
+                        <a href="#security" class="settings-nav-item" data-section="security">Session & Security</a>
+                    </nav>
+                </aside>
+                
+                <div class="settings-content">
+                    <!-- Account Section -->
+                    <section id="account-section" class="settings-section">
+                        <h2 class="section-title">Account</h2>
+                        <p class="section-description">Manage your account information and authentication</p>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Email Address</div>
+                                <div class="account-email" id="account-email">Loading...</div>
+                                <div class="last-login" id="last-login"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Change Password</div>
+                                <div class="setting-description">Update your account password</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="btn-secondary" id="change-password-btn">Change Password</button>
+                            </div>
+                        </div>
+                        
+                        <div class="password-form hidden" id="password-form">
+                            <div class="password-form-group">
+                                <label class="password-form-label" for="current-password">Current Password</label>
+                                <input type="password" id="current-password" class="password-form-input" autocomplete="current-password">
+                            </div>
+                            <div class="password-form-group">
+                                <label class="password-form-label" for="new-password">New Password</label>
+                                <input type="password" id="new-password" class="password-form-input" autocomplete="new-password">
+                            </div>
+                            <div class="password-form-group">
+                                <label class="password-form-label" for="confirm-password">Confirm New Password</label>
+                                <input type="password" id="confirm-password" class="password-form-input" autocomplete="new-password">
+                            </div>
+                            <div class="password-form-actions">
+                                <button class="btn-primary" id="save-password-btn">Save Password</button>
+                                <button class="btn-secondary" id="cancel-password-btn">Cancel</button>
+                            </div>
+                            <div class="password-message" id="password-message"></div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Log Out</div>
+                                <div class="setting-description">Sign out of your account</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="btn-danger" id="logout-btn">Log Out</button>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Appearance Section -->
+                    <section id="appearance-section" class="settings-section hidden">
+                        <h2 class="section-title">Appearance</h2>
+                        <p class="section-description">Customize the look and feel of the application</p>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Theme</div>
+                                <div class="setting-description">Choose your preferred color theme</div>
+                            </div>
+                            <div class="setting-control">
+                                <select id="theme-select" class="select-control">
+                                    <option value="light">Light</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="system">System</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Accessibility Section -->
+                    <section id="accessibility-section" class="settings-section hidden">
+                        <h2 class="section-title">Accessibility</h2>
+                        <p class="section-description">Adjust accessibility features to suit your needs</p>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Reduced Motion</div>
+                                <div class="setting-description">Reduce animations and transitions</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" id="reduced-motion-toggle" role="switch" aria-checked="false"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Font Size</div>
+                                <div class="setting-description">Adjust the base font size</div>
+                            </div>
+                            <div class="setting-control">
+                                <select id="font-size-select" class="select-control">
+                                    <option value="small">Small</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="large">Large</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">High Contrast Mode</div>
+                                <div class="setting-description">Increase contrast for better visibility</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" id="high-contrast-toggle" role="switch" aria-checked="false"></div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Privacy & Data Section -->
+                    <section id="privacy-section" class="settings-section hidden">
+                        <h2 class="section-title">Privacy & Data</h2>
+                        <p class="section-description">Control how your data is stored and used</p>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Save Study History</div>
+                                <div class="setting-description">Store your progress and study sessions</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" id="save-history-toggle" role="switch" aria-checked="true"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Personalized Recommendations</div>
+                                <div class="setting-description">Use your data to provide personalized suggestions</div>
+                            </div>
+                            <div class="setting-control">
+                                <div class="toggle-switch" id="recommendations-toggle" role="switch" aria-checked="true"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Study Progress</div>
+                                <div class="setting-description">Your lesson progress, quiz scores, and study history are saved per account</div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Clear Local Cache</div>
+                                <div class="setting-description">Remove all cached data including settings and progress for this account</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="btn-secondary" id="clear-cache-btn">Clear Cache</button>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Session & Security Section -->
+                    <section id="security-section" class="settings-section hidden">
+                        <h2 class="section-title">Session & Security</h2>
+                        <p class="section-description">Manage your active sessions and security settings</p>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Last Login</div>
+                                <div class="setting-description" id="security-last-login">Loading...</div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <div class="setting-title">Sign Out of All Sessions</div>
+                                <div class="setting-description">End all active sessions and require re-authentication</div>
+                            </div>
+                            <div class="setting-control">
+                                <button class="btn-danger" id="signout-all-btn">Sign Out All</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <p>&copy; 2024 APUSH Learning Hub. Designed for AP U.S. History exam preparation.</p>
+        </div>
+    </footer>
+
+    <script src="user-session.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Require authentication
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.AuthManager || !window.AuthManager.requireAuth()) {
+                return;
+            }
+            
+            initSettings();
+        });
+        
+        function initSettings() {
+            const userInfo = window.AuthManager.getUserInfo();
+            const settings = userInfo.settings;
+            
+            // Load account info
+            document.getElementById('account-email').textContent = userInfo.email;
+            if (userInfo.lastLogin) {
+                const lastLoginDate = new Date(userInfo.lastLogin);
+                document.getElementById('last-login').textContent = 
+                    `Last login: ${lastLoginDate.toLocaleString()}`;
+                document.getElementById('security-last-login').textContent = 
+                    lastLoginDate.toLocaleString();
+            }
+            
+            // Load settings values
+            if (settings) {
+                // Appearance
+                document.getElementById('theme-select').value = settings.theme || 'light';
+                
+                // Accessibility
+                const reducedMotionToggle = document.getElementById('reduced-motion-toggle');
+                reducedMotionToggle.classList.toggle('active', settings.reducedMotion || false);
+                reducedMotionToggle.setAttribute('aria-checked', settings.reducedMotion || false);
+                
+                document.getElementById('font-size-select').value = settings.fontSize || 'medium';
+                
+                const highContrastToggle = document.getElementById('high-contrast-toggle');
+                highContrastToggle.classList.toggle('active', settings.highContrast || false);
+                highContrastToggle.setAttribute('aria-checked', settings.highContrast || false);
+                
+                // Privacy
+                const saveHistoryToggle = document.getElementById('save-history-toggle');
+                saveHistoryToggle.classList.toggle('active', settings.saveHistory !== false);
+                saveHistoryToggle.setAttribute('aria-checked', settings.saveHistory !== false);
+                
+                const recommendationsToggle = document.getElementById('recommendations-toggle');
+                recommendationsToggle.classList.toggle('active', settings.personalizedRecommendations !== false);
+                recommendationsToggle.setAttribute('aria-checked', settings.personalizedRecommendations !== false);
+            }
+            
+            // Navigation
+            const navItems = document.querySelectorAll('.settings-nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = item.dataset.section;
+                    switchSection(section);
+                    
+                    navItems.forEach(ni => ni.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+            
+            // Theme change
+            document.getElementById('theme-select').addEventListener('change', (e) => {
+                window.AuthManager.updateSetting('theme', e.target.value);
+            });
+            
+            // Reduced motion toggle
+            document.getElementById('reduced-motion-toggle').addEventListener('click', function() {
+                const active = !this.classList.contains('active');
+                this.classList.toggle('active', active);
+                this.setAttribute('aria-checked', active);
+                window.AuthManager.updateSetting('reducedMotion', active);
+            });
+            
+            // Font size
+            document.getElementById('font-size-select').addEventListener('change', (e) => {
+                window.AuthManager.updateSetting('fontSize', e.target.value);
+                document.documentElement.setAttribute('data-font-size', e.target.value);
+            });
+            
+            // High contrast toggle
+            document.getElementById('high-contrast-toggle').addEventListener('click', function() {
+                const active = !this.classList.contains('active');
+                this.classList.toggle('active', active);
+                this.setAttribute('aria-checked', active);
+                window.AuthManager.updateSetting('highContrast', active);
+                document.documentElement.setAttribute('data-high-contrast', active ? 'true' : 'false');
+            });
+            
+            // Privacy toggles
+            document.getElementById('save-history-toggle').addEventListener('click', function() {
+                const active = !this.classList.contains('active');
+                this.classList.toggle('active', active);
+                this.setAttribute('aria-checked', active);
+                window.AuthManager.updateSetting('saveHistory', active);
+            });
+            
+            document.getElementById('recommendations-toggle').addEventListener('click', function() {
+                const active = !this.classList.contains('active');
+                this.classList.toggle('active', active);
+                this.setAttribute('aria-checked', active);
+                window.AuthManager.updateSetting('personalizedRecommendations', active);
+            });
+            
+            // Password change
+            document.getElementById('change-password-btn').addEventListener('click', () => {
+                const form = document.getElementById('password-form');
+                form.classList.toggle('hidden');
+            });
+            
+            document.getElementById('cancel-password-btn').addEventListener('click', () => {
+                document.getElementById('password-form').classList.add('hidden');
+                document.getElementById('password-message').classList.remove('show');
+                document.getElementById('current-password').value = '';
+                document.getElementById('new-password').value = '';
+                document.getElementById('confirm-password').value = '';
+            });
+            
+            document.getElementById('save-password-btn').addEventListener('click', () => {
+                const currentPassword = document.getElementById('current-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                const messageEl = document.getElementById('password-message');
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    messageEl.textContent = 'Please fill in all fields.';
+                    messageEl.className = 'password-message error show';
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    messageEl.textContent = 'New password must be at least 6 characters.';
+                    messageEl.className = 'password-message error show';
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    messageEl.textContent = 'Passwords do not match.';
+                    messageEl.className = 'password-message error show';
+                    return;
+                }
+                
+                try {
+                    window.AuthManager.changePassword(currentPassword, newPassword);
+                    messageEl.textContent = 'Password changed successfully!';
+                    messageEl.className = 'password-message success show';
+                    
+                    setTimeout(() => {
+                        document.getElementById('password-form').classList.add('hidden');
+                        messageEl.classList.remove('show');
+                        document.getElementById('current-password').value = '';
+                        document.getElementById('new-password').value = '';
+                        document.getElementById('confirm-password').value = '';
+                    }, 2000);
+                } catch (error) {
+                    messageEl.textContent = error.message || 'Failed to change password.';
+                    messageEl.className = 'password-message error show';
+                }
+            });
+            
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('Are you sure you want to log out?')) {
+                    window.AuthManager.logout();
+                }
+            });
+            
+            // Clear cache
+            document.getElementById('clear-cache-btn').addEventListener('click', () => {
+                if (confirm('This will clear all cached data for your account (settings and progress will be reset). Continue?')) {
+                    const userId = window.AuthManager.getCurrentUser().id;
+                    // Clear user-specific cached data
+                    localStorage.removeItem(`user_${userId}_settings`);
+                    localStorage.removeItem(`user_${userId}_progress`);
+                    // Note: We keep the session and user account data
+                    alert('Cache cleared. Please refresh the page.');
+                    window.location.reload();
+                }
+            });
+            
+            // Sign out all sessions
+            document.getElementById('signout-all-btn').addEventListener('click', () => {
+                if (confirm('This will sign you out of all sessions. Continue?')) {
+                    window.AuthManager.logout();
+                }
+            });
+        }
+        
+        function switchSection(section) {
+            const sections = document.querySelectorAll('.settings-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
+            
+            const targetSection = document.getElementById(`${section}-section`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

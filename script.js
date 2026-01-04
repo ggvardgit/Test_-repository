@@ -3,10 +3,25 @@
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize AuthManager if available (user-session.js should load before script.js)
+    if (typeof window.AuthManager !== 'undefined' && typeof window.AuthManager.init === 'function') {
+        // Only init if not already initialized
+        if (!window.AuthManager.currentUser && localStorage.getItem('apush_session')) {
+            window.AuthManager.init();
+        }
+    }
+    
     initNavigation();
     initThemeToggle();
     initMotionToggle();
     initModals();
+    
+    // Update navigation after a short delay to ensure AuthManager is ready
+    setTimeout(() => {
+        if (typeof updateNavigation === 'function') {
+            updateNavigation();
+        }
+    }, 100);
 });
 
 // Navigation functionality
@@ -28,8 +43,22 @@ function initThemeToggle() {
     const themeToggle = document.querySelector('.theme-toggle');
     const themeIcon = document.querySelector('.theme-icon');
     
-    // Check for saved theme preference or default to light mode
-    const currentTheme = localStorage.getItem('theme') || 'light';
+    // Check for user settings if authenticated, otherwise use localStorage
+    let currentTheme = 'light';
+    if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+        const settings = window.AuthManager.getCurrentUserSettings();
+        if (settings && settings.theme) {
+            if (settings.theme === 'system') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                currentTheme = prefersDark ? 'dark' : 'light';
+            } else {
+                currentTheme = settings.theme;
+            }
+        }
+    } else {
+        currentTheme = localStorage.getItem('theme') || 'light';
+    }
+    
     document.documentElement.setAttribute('data-theme', currentTheme);
     updateThemeIcon(currentTheme, themeIcon);
     
@@ -39,7 +68,14 @@ function initThemeToggle() {
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             
             document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
+            
+            // Save to user settings if authenticated, otherwise localStorage
+            if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+                window.AuthManager.updateSetting('theme', newTheme);
+            } else {
+                localStorage.setItem('theme', newTheme);
+            }
+            
             updateThemeIcon(newTheme, themeIcon);
         });
     }
@@ -55,8 +91,17 @@ function updateThemeIcon(theme, iconElement) {
 function initMotionToggle() {
     const motionToggle = document.querySelector('.motion-toggle');
     
-    // Check for saved preference
-    const reducedMotion = localStorage.getItem('reducedMotion') === 'true';
+    // Check for user settings if authenticated, otherwise use localStorage
+    let reducedMotion = false;
+    if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+        const settings = window.AuthManager.getCurrentUserSettings();
+        if (settings) {
+            reducedMotion = settings.reducedMotion || false;
+        }
+    } else {
+        reducedMotion = localStorage.getItem('reducedMotion') === 'true';
+    }
+    
     if (reducedMotion) {
         document.documentElement.setAttribute('data-reduced-motion', 'true');
     }
@@ -67,7 +112,13 @@ function initMotionToggle() {
             const newValue = current === 'true' ? 'false' : 'true';
             
             document.documentElement.setAttribute('data-reduced-motion', newValue);
-            localStorage.setItem('reducedMotion', newValue);
+            
+            // Save to user settings if authenticated, otherwise localStorage
+            if (window.AuthManager && window.AuthManager.isAuthenticated()) {
+                window.AuthManager.updateSetting('reducedMotion', newValue === 'true');
+            } else {
+                localStorage.setItem('reducedMotion', newValue);
+            }
         });
     }
 }
@@ -124,20 +175,71 @@ function closeModal(modal) {
 }
 
 // Utility function to get user progress from localStorage
+// Uses user-specific key if authenticated, otherwise falls back to global
 function getUserProgress() {
-    const progress = localStorage.getItem('userProgress');
-    return progress ? JSON.parse(progress) : {
-        periods: {},
-        skills: {},
-        practiceQuestions: 0,
-        studyHours: 0,
-        activities: []
-    };
+    let progressKey = 'userProgress';
+    
+    // If user is authenticated, use user-specific key
+    try {
+        if (window.AuthManager && typeof window.AuthManager.isAuthenticated === 'function' && window.AuthManager.isAuthenticated()) {
+            const currentUser = window.AuthManager.getCurrentUser();
+            if (currentUser && currentUser.id) {
+                progressKey = `user_${currentUser.id}_progress`;
+            }
+        }
+    } catch (e) {
+        // If AuthManager is not ready yet, fall back to global key
+        console.debug('AuthManager not ready, using global progress key');
+    }
+    
+    try {
+        const progress = localStorage.getItem(progressKey);
+        return progress ? JSON.parse(progress) : {
+            periods: {},
+            skills: {},
+            practiceQuestions: 0,
+            studyHours: 0,
+            activities: []
+        };
+    } catch (e) {
+        console.error('Failed to parse progress data:', e);
+        return {
+            periods: {},
+            skills: {},
+            practiceQuestions: 0,
+            studyHours: 0,
+            activities: []
+        };
+    }
 }
 
 // Utility function to save user progress
+// Uses user-specific key if authenticated, otherwise falls back to global
 function saveUserProgress(progress) {
-    localStorage.setItem('userProgress', JSON.stringify(progress));
+    let progressKey = 'userProgress';
+    
+    // If user is authenticated, use user-specific key
+    try {
+        if (window.AuthManager && typeof window.AuthManager.isAuthenticated === 'function' && window.AuthManager.isAuthenticated()) {
+            const currentUser = window.AuthManager.getCurrentUser();
+            if (currentUser && currentUser.id) {
+                progressKey = `user_${currentUser.id}_progress`;
+            }
+        }
+    } catch (e) {
+        // If AuthManager is not ready yet, fall back to global key
+        console.debug('AuthManager not ready, using global progress key');
+    }
+    
+    try {
+        localStorage.setItem(progressKey, JSON.stringify(progress));
+    } catch (e) {
+        console.error('Failed to save progress:', e);
+        // Try to clear space if quota exceeded
+        if (e.name === 'QuotaExceededError') {
+            alert('Storage quota exceeded. Please clear some data.');
+        }
+    }
 }
 
 // Utility function to update progress
