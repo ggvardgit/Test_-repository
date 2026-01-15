@@ -3,8 +3,8 @@
 
 const APUSH_DATA = {
     periods: {
-        2: {
-            number: 2,
+        1: {
+            number: 1,
             name: "Colonial America",
             dates: "1607-1754",
             difficulty: 2,
@@ -108,8 +108,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        3: {
-            number: 3,
+        2: {
+            number: 2,
             name: "Revolution and Early Republic",
             dates: "1754-1800",
             difficulty: 3,
@@ -204,8 +204,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        4: {
-            number: 4,
+        3: {
+            number: 3,
             name: "Expansion and Reform",
             dates: "1800-1848",
             difficulty: 3,
@@ -286,8 +286,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        5: {
-            number: 5,
+        4: {
+            number: 4,
             name: "Civil War and Reconstruction",
             dates: "1844-1877",
             difficulty: 4,
@@ -376,8 +376,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        6: {
-            number: 6,
+        5: {
+            number: 5,
             name: "Gilded Age",
             dates: "1865-1898",
             difficulty: 3,
@@ -453,8 +453,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        7: {
-            number: 7,
+        6: {
+            number: 6,
             name: "Progressive Era to World War II",
             dates: "1890-1945",
             difficulty: 4,
@@ -541,8 +541,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        8: {
-            number: 8,
+        7: {
+            number: 7,
             name: "Cold War Era",
             dates: "1945-1980",
             difficulty: 4,
@@ -628,8 +628,8 @@ const APUSH_DATA = {
                 }
             ]
         },
-        9: {
-            number: 9,
+        8: {
+            number: 8,
             name: "Modern America",
             dates: "1980-Present",
             difficulty: 3,
