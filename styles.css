@@ -2437,3 +2437,47 @@ button:disabled {
         padding: 0;
     }
 }
+
+/* Sources Section */
+.sources-section {
+    padding: var(--spacing-2xl) 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.sources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.source-card {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-base);
+}
+
+.source-card:hover {
+    background-color: var(--bg-tertiary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.source-title {
+    font-size: 1rem;
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-color);
+}
+
+.source-text {
+    font-size: 0.8125rem;
+    margin-bottom: var(--spacing-md);
+    flex-grow: 1;
+}
+
+.source-link {
+    font-size: 0.8125rem;
+    font-weight
