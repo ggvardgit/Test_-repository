@@ -315,14 +315,21 @@
     <script src="user-session.js"></script>
     <script>
         // Redirect if already logged in
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.AuthManager && window.AuthManager.isAuthenticated()) {
-                window.location.href = 'index.html';
-                return;
-            }
+        document.getElementById("loginForm").addEventListener("submit", function(e){
+            e.preventDefault();
             
-            initLoginForm();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            if(username === "admin" && password === "fbla123"){
+                localStorage.setItem("loggedIn", "true");
+                window.location.href = "dashboard.html";
+            
+            } else {
+                alert("Invalid username or password");
+            }
         });
+
         
         function initLoginForm() {
             const form = document.getElementById('login-form');
